@@ -1,0 +1,27 @@
+﻿pipeline {
+  agent any
+
+  stages {
+    stage('Build') {
+      when { changeRequest target: 'main' }
+      steps {
+        sh 'dotnet restore'
+        sh 'dotnet build --no-restore'
+      }
+    }
+
+    stage('Test') {
+      when { changeRequest target: 'main' }
+      steps {
+        sh 'dotnet test --no-build --no-restore --collect "XPlat Code Coverage"'
+      }
+    }
+
+    stage('Deliver') {
+      when { changeRequest target: 'main' }
+      steps {
+        sh 'dotnet publish SimpleWebApi --no-restore -o published'
+      }
+    }
+  }
+}
